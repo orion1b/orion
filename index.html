@@ -3,9 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#13201E">
+<meta name="description" content="A writing manager for plot, characters, chapters, world building, timeline and notes.">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Story Desk">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
 <title>Story Desk</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700&family=IBM+Plex+Mono:wght@400;500&family=Literata:opsz,wght@7..72,400;7..72,500&family=Public+Sans:wght@400;500;600&display=swap">
 <style>
@@ -46,7 +53,7 @@ h1,h2,h3,p{margin:0}
 .banner{grid-row:2}
 #nav{grid-row:3}
 #main{grid-row:4}
-.top{display:flex;align-items:center;gap:12px;min-width:0}
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;min-width:0}
 .brand{font:700 20px/1 var(--f-display);letter-spacing:-.01em;white-space:nowrap}
 .proj{flex:1;min-width:0;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .save{font:400 12px var(--f-mono);color:var(--muted);white-space:nowrap}
@@ -82,7 +89,7 @@ h1,h2,h3,p{margin:0}
 .row{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:1px solid transparent;background:transparent;border-radius:8px;padding:8px 8px;min-width:0}
 .row:hover{background:var(--surface2)}
 .row.on{background:var(--surface2);border-color:var(--line)}
-.row .num{flex:none;font:500 12px/1.6 var(--f-mono);color:var(--muted);min-width:1.6em}
+.row .num{flex:none;font:500 12px/1.6 var(--f-mono);color:var(--muted);min-width:2.4em}
 .row .t{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .row .s{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:12.5px;overflow:hidden;white-space:nowrap}
 .row .s span{overflow:hidden;text-overflow:ellipsis}
@@ -139,7 +146,25 @@ button.chip:hover{border-color:var(--muted)}
 .toast[hidden]{display:none}
 .err-box{padding:24px;display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 
+.quick{display:flex;flex-wrap:wrap;gap:6px;padding:0 12px 8px}
+.hint{color:var(--muted);font-size:13px}
+.rels{display:flex;flex-direction:column;gap:8px}
+.rel{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:4px 12px;align-items:center}
+.rel label{display:flex;flex-direction:column;min-width:0}
+.rel .rn{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rel .rr{font:400 11px var(--f-mono);color:var(--muted)}
+.rel input{width:100%;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:8px;padding:8px 10px}
+.seen{display:flex;flex-direction:column;align-items:flex-start;gap:6px;margin-top:8px}
+.seen .chip{border-radius:8px;text-align:left;max-width:100%}
+.overlay{position:fixed;inset:0;z-index:20;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(10,16,15,.55)}
+.dlg{width:100%;max-width:460px;max-height:100%;overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:14px;box-shadow:0 12px 40px var(--shadow)}
+.dlg h2{font:700 20px var(--f-display)}
+.dlg .counts{font:400 12px/1.6 var(--f-mono);color:var(--muted)}
+.dlg .opt{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.dlg .opt p{color:var(--muted);font-size:13px}
+.dlg .note{color:var(--accent);font-size:13px}
 /* phones: one pane at a time */
+@media (max-width:520px){.rel{grid-template-columns:minmax(0,1fr)}}
 .app[data-pane="list"] .editor{display:none}
 .app[data-pane="editor"] .listpane{display:none}
 @media (min-width:760px){
@@ -159,18 +184,24 @@ button.chip:hover{border-color:var(--muted)}
 @media (max-width:759px){.titlefield{font-size:22px}.acts .c{font-size:20px}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
+</head>
+<body>
 
 <div class="app" id="app" data-pane="list">
   <header class="top">
     <span class="brand">Story Desk</span>
     <span class="proj" id="projname"></span>
     <span class="save" id="save" role="status" aria-live="polite"></span>
+    <button class="btn sm" id="import-btn" disabled>Import backup</button>
+    <button class="btn sm" id="install" hidden>Install app</button>
   </header>
   <div class="banner" id="banner" hidden></div>
   <nav id="nav" aria-label="Sections"></nav>
   <main id="main"></main>
 </div>
 <div class="toast" id="toast" role="status" hidden></div>
+<div class="overlay" id="overlay" hidden></div>
+<input type="file" id="import-file" accept=".json,application/json" hidden>
 
 <script>
 (function(){
@@ -206,7 +237,8 @@ function rafDebounce(fn){var p=false;return function(){if(p)return;p=true;reques
 /* ---------- vocabulary ---------- */
 var ACTS=['Act I','Act II','Act III'];
 var BEATS=['Hook','Inciting incident','First turning point','Rising action','Midpoint','Crisis','Climax','Resolution','Other'];
-var ROLES=['Protagonist','Antagonist','Supporting','Minor'];
+var ROLES=['Protagonist','Main antagonist','Minor antagonist','Supporting','Minor'];
+var CHAPKINDS=['Prologue','Chapter','Epilogue'];
 var STATUS=['Idea','Drafting','Revising','Done'];
 var SCOLOR={Idea:'var(--s-idea)',Drafting:'var(--s-draft)',Revising:'var(--s-revise)',Done:'var(--s-done)'};
 var WCATS=['Places','Peoples & cultures','Magic & technology','History','Objects','Rules & laws','Other'];
@@ -221,15 +253,16 @@ var SECT={
     fields:[{k:'act',label:'Act',kind:'select',opts:opts(ACTS)},{k:'beat',label:'Story beat',kind:'select',opts:opts(BEATS)},
       {k:'summary',label:'What happens',kind:'textarea',rows:4},{k:'conflict',label:'Conflict and stakes',kind:'textarea',rows:3},{k:'outcome',label:'What changes afterwards',kind:'textarea',rows:3}]},
   character:{label:'Characters',one:'character',group:'role',groups:ROLES,titleKey:'name',titlePh:'Character name',
-    blank:function(){return {name:'New character',role:'Supporting',age:'',occupation:'',appearance:'',personality:'',want:'',fear:'',backstory:'',arc:'',relationships:''}},
+    blank:function(){return {name:'New character',role:'Supporting',age:'',occupation:'',appearance:'',personality:'',want:'',fear:'',backstory:'',arc:'',relationships:'',rels:{}}},
     sub:function(i){return [i.occupation,i.age?('age '+i.age):''].filter(Boolean).join(' · ')},
     fields:[{k:'role',label:'Role',kind:'select',opts:opts(ROLES)},{k:'age',label:'Age',kind:'text'},{k:'occupation',label:'Occupation',kind:'text'},
       {k:'appearance',label:'Appearance',kind:'textarea',rows:3},{k:'personality',label:'Personality and voice',kind:'textarea',rows:3},
       {k:'want',label:'What they want',kind:'textarea',rows:2},{k:'fear',label:'Fear or flaw',kind:'textarea',rows:2},
-      {k:'backstory',label:'Backstory',kind:'textarea',rows:4},{k:'arc',label:'Arc across the story',kind:'textarea',rows:3},{k:'relationships',label:'Relationships',kind:'textarea',rows:3}]},
-  chapter:{label:'Chapters',one:'chapter',ordered:true,titleKey:'title',titlePh:'Chapter title',
-    blank:function(){return {title:'Untitled chapter',status:'Drafting',pov:'',setting:'',summary:'',body:''}},
-    fields:[{k:'status',label:'Status',kind:'select',opts:opts(STATUS)},{k:'pov',label:'Point of view',kind:'char'},{k:'setting',label:'Setting',kind:'text'},
+      {k:'backstory',label:'Backstory',kind:'textarea',rows:4},{k:'arc',label:'Arc across the story',kind:'textarea',rows:3},{k:'rels',label:'Relationships',kind:'rels'},{k:'relationships',label:'Other relationships and notes',kind:'textarea',rows:3}]},
+  chapter:{label:'Chapters',one:'chapter',ordered:true,group:'kind',groups:CHAPKINDS,dg:'Chapter',
+    glabel:{Prologue:'Prologue',Chapter:'Chapters',Epilogue:'Epilogue'},titleKey:'title',titlePh:'Chapter title',
+    blank:function(){return {title:'Untitled chapter',kind:'Chapter',status:'Drafting',pov:'',setting:'',summary:'',body:''}},
+    fields:[{k:'kind',label:'Type',kind:'select',opts:opts(CHAPKINDS),rerender:true},{k:'status',label:'Status',kind:'select',opts:opts(STATUS)},{k:'pov',label:'Point of view',kind:'char'},{k:'setting',label:'Setting',kind:'text'},
       {k:'summary',label:'Summary',kind:'textarea',rows:3},{k:'body',label:'Draft',kind:'prose'}]},
   world:{label:'World',one:'world entry',group:'category',groups:WCATS,titleKey:'name',titlePh:'Name',
     blank:function(){return {name:'New entry',category:'Places',description:'',details:''}},
@@ -253,14 +286,16 @@ var DB=null,DL=null,mode='memory',saveState='',active=0,failed=false;
 var app=$('#app');
 
 function all(type){var a=[];S.items.forEach(function(v){if(v.type===type)a.push(v)});return a}
+function gval(i,cfg){return i[cfg.group]||cfg.dg||'Other'}
 function sortItems(type){
   var cfg=SECT[type],a=all(type);
-  function gi(i){var g=cfg.groups.indexOf(i[cfg.group]);return g<0?99:g}
+  function gi(i){var g=cfg.groups.indexOf(gval(i,cfg));return g<0?99:g}
   if(type==='note') return a.sort(function(x,y){return (y.pinned?1:0)-(x.pinned?1:0)||(y.updatedAt||0)-(x.updatedAt||0)});
   if(cfg.ordered) return a.sort(function(x,y){return (cfg.group?gi(x)-gi(y):0)||(x.order||0)-(y.order||0)});
   return a.sort(function(x,y){return gi(x)-gi(y)||String(x[cfg.titleKey]||'').localeCompare(String(y[cfg.titleKey]||''))});
 }
-function chapterNo(item){var a=sortItems('chapter');for(var i=0;i<a.length;i++)if(a[i].id===item.id)return i+1;return 0}
+function chapterNo(item){var n=0,a=sortItems('chapter');for(var i=0;i<a.length;i++){if(gval(a[i],SECT.chapter)==='Chapter')n++;if(a[i].id===item.id)return n}return 0}
+function chapLabel(c,short){var k=gval(c,SECT.chapter);return k==='Chapter'?(short?'Ch. ':'Chapter ')+chapterNo(c):k}
 function nextOrder(type){var m=-1;all(type).forEach(function(i){if((i.order||0)>m)m=i.order||0});return m+1}
 function charName(id){var c=S.items.get(id);return c&&c.type==='character'?(c.name||'Unnamed'):''}
 function totalWords(){var n=0;all('chapter').forEach(function(c){n+=words(c.body)});return n}
@@ -310,8 +345,15 @@ async function init(){
   if(useFn){
     window.claude.use('downloads').then(function(d){DL=d;if(S.section==='overview'&&S.ready)render()}).catch(function(){});
     await loadCloud(true);
-  }else{loadLocal()}
+  }else{DL=browserDL();loadLocal();registerSW()}
 }
+function migrate(it){
+  var ch=false;
+  if(it.type==='character'&&it.role==='Antagonist'){it.role='Main antagonist';ch=true}
+  if(it.type==='chapter'&&!it.kind){it.kind='Chapter';ch=true}
+  return ch;
+}
+function migrateAll(){S.items.forEach(function(v){if(migrate(v))markDirty(v.id)})}
 async function loadCloud(first){
   S.loadError=false;
   var ns=null;
@@ -322,7 +364,7 @@ async function loadCloud(first){
     var res=await Promise.all([DB.collection('items').limit(1000).get(),DB.doc('meta/project').get()]);
     res[0].docs.forEach(function(d){var v=d.data();if(v&&!S.items.has(d.id)){v=Object.assign({},v);v.id=d.id;S.items.set(d.id,v)}});
     if(res[1].exists) S.project=Object.assign({},S.project,res[1].data());
-    mode='cloud';S.ready=true;
+    mode='cloud';S.ready=true;migrateAll();
   }catch(e){S.loadError=true}
   render();
 }
@@ -331,7 +373,7 @@ function loadLocal(){
     var raw=localStorage.getItem('storydesk.v1');mode='local';
     if(raw){var d=JSON.parse(raw);if(d.project)S.project=Object.assign({},S.project,d.project);(d.items||[]).forEach(function(i){S.items.set(i.id,i)})}
   }catch(e){mode='memory'}
-  S.ready=true;render();
+  S.ready=true;migrateAll();render();
 }
 
 /* ---------- actions ---------- */
@@ -350,8 +392,8 @@ function addItem(type,preset){
   var it=Object.assign({id:uid(),type:type,order:nextOrder(type),createdAt:Date.now(),updatedAt:Date.now()},cfg.blank(),preset||{});
   S.items.set(it.id,it);markDirty(it.id);return it;
 }
-function newItem(){
-  var it=addItem(S.section);if(!it)return;
+function newItem(preset){
+  var it=addItem(S.section,preset&&!preset.target?preset:undefined);if(!it)return;
   S.q='';var q=$('#q');if(q)q.value='';
   renderNav();select(it.id);
   var f=$('#editor .titlefield');if(f){f.focus();f.select()}
@@ -365,12 +407,15 @@ function addTemplate(){
 }
 function removeItem(item){
   S.items.delete(item.id);
-  if(item.type==='character') all('chapter').forEach(function(c){if(c.pov===item.id){c.pov='';markDirty(c.id)}});
+  if(item.type==='character'){
+    all('chapter').forEach(function(c){if(c.pov===item.id){c.pov='';markDirty(c.id)}});
+    all('character').forEach(function(c){if(c.rels&&c.rels[item.id]!==undefined){c.rels=Object.assign({},c.rels);delete c.rels[item.id];markDirty(c.id)}});
+  }
   markDirty(item.id);S.sel=null;S.pane='list';render();
 }
 function move(item,dir){
   var cfg=SECT[item.type];
-  var a=sortItems(item.type).filter(function(x){return !cfg.group||x[cfg.group]===item[cfg.group]});
+  var a=sortItems(item.type).filter(function(x){return !cfg.group||gval(x,cfg)===gval(item,cfg)});
   var i=a.findIndex(function(x){return x.id===item.id}),j=i+dir;
   if(j<0||j>=a.length) return;
   var t=a[i];a[i]=a[j];a[j]=t;
@@ -388,8 +433,9 @@ function clearExamples(){
 function exportMd(){
   var p=S.project,out=['# '+(p.title||'Untitled story')];
   if(p.logline) out.push('*'+p.logline+'*');
-  sortItems('chapter').forEach(function(c,n){
-    out.push('## Chapter '+(n+1)+(c.title?': '+c.title:''));
+  sortItems('chapter').forEach(function(c){
+    var k=gval(c,SECT.chapter);
+    out.push('## '+(k==='Chapter'?'Chapter '+chapterNo(c):k)+(c.title?': '+c.title:''));
     if(c.body) out.push(c.body.trim());
   });
   save(slug(p.title)+'-manuscript.md',out.join('\n\n')+'\n');
@@ -403,8 +449,96 @@ function save(name,data){
   DL.save({filename:name,data:data}).then(function(){toast('Saved '+name)}).catch(function(e){if(!e||e.code!=='declined')toast('Could not save the file')});
 }
 
+/* ---------- import ---------- */
+function isDefaultProject(){var p=S.project;return (!p.title||p.title==='Untitled story')&&!p.logline&&!p.deadline}
+function openImport(){if(S.ready)$('#import-file').click()}
+function closeOverlay(){var ov=$('#overlay');ov.hidden=true;ov.textContent=''}
+function readImport(file){
+  var r=new FileReader();
+  r.onerror=function(){toast('Could not read that file')};
+  r.onload=function(){
+    var d=null;try{d=JSON.parse(r.result)}catch(e){}
+    if(!d||typeof d!=='object'||!Array.isArray(d.items)){toast('That file is not a Story Desk backup');return}
+    var items=[],skipped=0;
+    d.items.forEach(function(i){
+      if(i&&typeof i==='object'&&typeof i.id==='string'&&/^[A-Za-z0-9_.~:@+-]{1,200}$/.test(i.id)&&i.id!=='.'&&i.id!=='..'&&SECT[i.type]){migrate(i);items.push(i)}else skipped++;
+    });
+    var proj=d.project&&typeof d.project==='object'&&!Array.isArray(d.project)?d.project:null;
+    if(!items.length&&!proj){toast('That backup has no entries');return}
+    confirmImport({project:proj,items:items,skipped:skipped});
+  };
+  r.readAsText(file);
+}
+function confirmImport(imp){
+  var ov=$('#overlay'),counts={};
+  imp.items.forEach(function(i){counts[i.type]=(counts[i.type]||0)+1});
+  var line=Object.keys(SECT).filter(function(k){return counts[k]}).map(function(k){return SECT[k].label+' '+counts[k]}).join(' · ');
+  var armed=false;
+  var merge=h('button',{class:'btn pri',text:'Merge into my work',onclick:function(){applyImport(imp,false)}});
+  var rep=h('button',{class:'btn',text:'Replace my work'});
+  rep.addEventListener('click',function(){
+    if(!armed){armed=true;rep.textContent='Click again to replace everything';rep.classList.add('danger');return}
+    applyImport(imp,true);
+  });
+  var name=imp.project&&imp.project.title?'“'+imp.project.title+'”':'This backup';
+  ov.textContent='';
+  ov.append(h('div',{class:'dlg',role:'dialog','aria-modal':'true','aria-labelledby':'dlg-t'},
+    h('h2',{id:'dlg-t',text:'Import backup'}),
+    h('p',{text:name+' has '+imp.items.length+' '+(imp.items.length===1?'entry':'entries')+'. You have '+S.items.size+' now.'}),
+    line?h('div',{class:'counts',text:line}):null,
+    imp.skipped?h('p',{class:'note',text:imp.skipped+' unreadable '+(imp.skipped===1?'entry was':'entries were')+' left out.'}):null,
+    h('div',{class:'opt'},merge,h('p',{text:'Adds everything from the backup. An entry that exists in both is replaced by the backup’s version. Your title, pitch and goal stay unless they are still blank.'})),
+    h('div',{class:'opt'},rep,h('p',{text:'Removes your current entries first, then loads the backup, including its title and goal.'})),
+    h('div',{class:'opt'},h('button',{class:'btn',text:'Cancel',onclick:closeOverlay}))));
+  ov.hidden=false;merge.focus();
+}
+async function persistMany(ids){
+  setSave('saving');
+  var bad=false;
+  if(mode==='cloud'){
+    for(var i=0;i<ids.length;i++){try{await persistOne(ids[i])}catch(e){bad=true}}
+  }else{await persistLocal()}
+  setSave(bad?'error':'saved');
+  return !bad;
+}
+async function applyImport(imp,replace){
+  closeOverlay();
+  var ids=[],keep={};
+  imp.items.forEach(function(i){keep[i.id]=1});
+  if(replace){
+    S.items.forEach(function(v,id){if(!keep[id])ids.push(id)});
+    ids.forEach(function(id){S.items.delete(id)});
+    if(imp.project)S.project=Object.assign({title:'Untitled story',logline:'',format:'Novel',goal:80000,deadline:''},imp.project);
+    ids.push('meta');
+  }else if(imp.project&&isDefaultProject()){
+    S.project=Object.assign({},S.project,imp.project);ids.push('meta');
+  }
+  imp.items.forEach(function(i){if(!i.updatedAt)i.updatedAt=Date.now();S.items.set(i.id,i);ids.push(i.id)});
+  S.sel=null;S.pane='list';render();
+  var ok=await persistMany(ids);
+  toast(ok?('Imported '+imp.items.length+' '+(imp.items.length===1?'entry':'entries')):'Imported, but some entries could not be saved');
+}
+
+/* ---------- standalone app helpers ---------- */
+function browserDL(){
+  return {save:function(o){return new Promise(function(res,rej){
+    try{
+      var type=/\.json$/.test(o.filename)?'application/json':'text/markdown';
+      var u=URL.createObjectURL(new Blob([o.data],{type:type}));
+      var a=document.createElement('a');a.href=u;a.download=o.filename;document.body.append(a);a.click();a.remove();
+      setTimeout(function(){URL.revokeObjectURL(u)},1500);res({status:'saved'});
+    }catch(e){rej(e)}
+  })}};
+}
+function registerSW(){
+  try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
+  if('serviceWorker' in navigator&&(location.protocol==='https:'||location.hostname==='localhost'||location.hostname==='127.0.0.1')){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  }
+}
+
 /* ---------- rendering ---------- */
-function render(){renderNav();renderBanner();renderMain();renderStatus();$('#projname').textContent=S.project.title||''}
+function render(){renderNav();renderBanner();renderMain();renderStatus();$('#projname').textContent=S.project.title||'';$('#import-btn').disabled=!S.ready}
 function renderNav(){
   var nav=$('#nav');nav.textContent='';
   ORDER.forEach(function(k){
@@ -438,7 +572,10 @@ function buildSplit(){
     h('button',{class:'btn pri sm',disabled:!S.ready,onclick:newItem,text:'+ New '+cfg.one}));
   var q=h('input',{id:'q',class:'search',type:'search',placeholder:'Search '+cfg.label.toLowerCase(),'aria-label':'Search '+cfg.label.toLowerCase(),value:S.q,
     oninput:function(e){S.q=e.target.value;renderListBody()}});
-  var split=h('div',{class:'split'},h('section',{class:'listpane'},head,q,h('div',{id:'listbody'})),h('section',{class:'editor',id:'editor','aria-label':'Editor'}));
+  var quick=S.section==='chapter'?h('div',{class:'quick'},
+    h('button',{class:'btn sm',disabled:!S.ready,onclick:function(){newItem({kind:'Prologue',title:'Prologue'})},text:'+ Prologue'}),
+    h('button',{class:'btn sm',disabled:!S.ready,onclick:function(){newItem({kind:'Epilogue',title:'Epilogue'})},text:'+ Epilogue'})):null;
+  var split=h('div',{class:'split'},h('section',{class:'listpane'},head,quick,q,h('div',{id:'listbody'})),h('section',{class:'editor',id:'editor','aria-label':'Editor'}));
   setTimeout(function(){renderListBody();renderEditor()},0);
   return split;
 }
@@ -460,26 +597,29 @@ function renderListBody(){
   }
   if(!arr.length){box.append(h('div',{class:'empty',text:'Nothing matches “'+S.q+'”.'}));return}
   var lastGroup=null;
+  var seenGroups={};arr.forEach(function(x){seenGroups[gval(x,cfg)]=1});
+  var showHdr=cfg.group&&(type!=='chapter'||Object.keys(seenGroups).length>1);
   arr.forEach(function(it){
-    if(cfg.group){
-      var g=it[cfg.group]||'Other';
+    if(showHdr){
+      var g=gval(it,cfg);
       if(g!==lastGroup){
-        var cnt=arr.filter(function(x){return (x[cfg.group]||'Other')===g}).length;
-        box.append(h('div',{class:'grp'},h('span',{text:g}),h('span',{text:cnt})));lastGroup=g;
+        var cnt=arr.filter(function(x){return gval(x,cfg)===g}).length;
+        box.append(h('div',{class:'grp'},h('span',{text:(cfg.glabel&&cfg.glabel[g])||g}),h('span',{text:cnt})));lastGroup=g;
       }
     }
     box.append(buildRow(it));
   });
 }
 var EMPTY={plot:'Map the turning points of the story, act by act.',character:'Keep each person’s goals, flaws and history in one place.',
-  chapter:'Plan and write your chapters here. Word counts add up on the overview.',world:'Record places, cultures, rules and history as you invent them.',
+  chapter:'Plan and write your chapters here, with a prologue or epilogue if the story has one. Word counts add up on the overview.',world:'Record places, cultures, rules and history as you invent them.',
   timeline:'Order the events of your story, including ones that happen before page one.',note:'Park ideas, research and fixes for later.'};
 function buildRow(it){
   var type=it.type,cfg=SECT[type],on=it.id===S.sel;
   var title=it[cfg.titleKey]||'Untitled';
   var lead=null,sub;
   if(type==='chapter'){
-    lead=h('span',{class:'num',text:String(chapterNo(it)).padStart(2,'0')});
+    var ck=gval(it,cfg);
+    lead=h('span',{class:'num',text:ck==='Chapter'?String(chapterNo(it)).padStart(2,'0'):(ck==='Prologue'?'Pro':'Epi')});
     sub=h('span',{class:'s'},h('i',{class:'dot',style:'background:'+SCOLOR[it.status]}),h('span',{text:fmt(words(it.body))+' words · '+it.status}));
   }else if(type==='note'){
     sub=h('span',{class:'s'},h('span',{text:(it.pinned?'Pinned · ':'')+it.tag+(it.body?' · '+it.body.slice(0,50):'')}));
@@ -510,7 +650,7 @@ function renderEditor(){
   });
   var top=h('div',{class:'ed-top'},
     h('button',{class:'btn sm back',onclick:function(){S.pane='list';app.dataset.pane='list'},text:'← List'}),
-    h('span',{class:'kind',text:it.type==='chapter'?'Chapter '+chapterNo(it):cfg.one}),h('span',{class:'sp'}));
+    h('span',{class:'kind',text:it.type==='chapter'?chapLabel(it):cfg.one}),h('span',{class:'sp'}));
   if(cfg.ordered){
     top.append(h('button',{class:'btn sm','aria-label':'Move up',text:'↑ Up',onclick:function(){move(it,-1)}}),
       h('button',{class:'btn sm','aria-label':'Move down',text:'↓ Down',onclick:function(){move(it,1)}}));
@@ -528,13 +668,42 @@ function renderEditor(){
       ed.append(h('div',{class:'fld'},h('span',{class:'lab',text:'Point of view in'}),
         h('div',{class:'chips'},povs.map(function(c){
           return h('button',{class:'chip',onclick:function(){S.section='chapter';S.q='';S.sel=c.id;S.pane='editor';render()},
-            text:'Ch. '+chapterNo(c)+' · '+(c.title||'Untitled')});
+            text:chapLabel(c,true)+' · '+(c.title||'Untitled')});
         }))));
     }
   }
   box.append(ed);
 }
+function setRel(it,cid,v){
+  var r=Object.assign({},it.rels||{});
+  if(v.trim()) r[cid]=v; else delete r[cid];
+  setField(it,'rels',r);
+}
+function buildRels(it){
+  var others=sortItems('character').filter(function(c){return c.id!==it.id});
+  var wrap=h('div',{class:'fld wide'},h('span',{class:'lab',text:'Relationships'}));
+  if(!others.length){
+    wrap.append(h('p',{class:'hint',text:'Add more characters and they will be listed here, so you can note how each one relates to '+(it.name||'this character')+'.'}));
+  }else{
+    var list=h('div',{class:'rels'});
+    others.forEach(function(c){
+      var iid='rel-'+c.id;
+      list.append(h('div',{class:'rel'},
+        h('label',{for:iid},h('span',{class:'rn',text:c.name||'Unnamed'}),h('span',{class:'rr',text:c.role||''})),
+        h('input',{id:iid,type:'text',value:(it.rels&&it.rels[c.id])||'',placeholder:'How are they connected? e.g. older sister, rival',
+          oninput:function(e){setRel(it,c.id,e.target.value)}})));
+    });
+    wrap.append(list);
+  }
+  var seen=others.filter(function(c){return c.rels&&c.rels[it.id]});
+  if(seen.length){
+    wrap.append(h('div',{class:'seen'},h('span',{class:'lab',text:'How others describe them'}),
+      seen.map(function(c){return h('button',{class:'chip',onclick:function(){select(c.id)},text:(c.name||'Unnamed')+': '+c.rels[it.id]})})));
+  }
+  return wrap;
+}
 function buildField(it,f){
+  if(f.kind==='rels') return buildRels(it);
   var id='f-'+f.k,val=it[f.k],input;
   var wide=f.kind==='textarea'||f.kind==='prose'||f.kind==='check';
   if(f.kind==='textarea'||f.kind==='prose'){
@@ -546,7 +715,7 @@ function buildField(it,f){
       }});
   }else if(f.kind==='select'||f.kind==='char'){
     var o=f.kind==='char'?[{v:'',t:'None'}].concat(sortItems('character').map(function(c){return {v:c.id,t:c.name||'Unnamed'}})):f.opts;
-    input=h('select',{id:id,onchange:function(e){setField(it,f.k,e.target.value)}},
+    input=h('select',{id:id,onchange:function(e){setField(it,f.k,e.target.value);if(f.rerender)renderEditor()}},
       o.map(function(x){return h('option',{value:x.v,selected:x.v===(val||''),text:x.t})}));
   }else if(f.kind==='check'){
     return h('div',{class:'fld wide'},h('label',{class:'chk'},h('input',{type:'checkbox',checked:!!val,onchange:function(e){setField(it,f.k,e.target.checked)}}),f.label));
@@ -583,8 +752,10 @@ function buildOverview(){
       h('div',{class:'fld'},h('label',{for:'p-due',text:'Finish by'}),h('input',{id:'p-due',type:'date',value:p.deadline||'',oninput:function(e){edit('deadline',e.target.value)}}))));
   var exp=h('div',{class:'btns'});
   if(DL){exp.append(h('button',{class:'btn',text:'Export manuscript (.md)',onclick:exportMd}),h('button',{class:'btn',text:'Back up everything (.json)',onclick:exportJson}))}
+  exp.append(h('button',{class:'btn',text:'Import a backup',onclick:openImport}));
   var side=h('div',{style:'display:flex;flex-direction:column;gap:16px;min-width:0'},stats);
-  if(DL) side.append(h('div',{class:'card'},h('h2',{text:'Take it with you'}),exp));
+  side.append(h('div',{class:'card'},h('h2',{text:'Backup and import'}),exp,
+    h('p',{class:'pace',text:'Import a .json file made with “Back up everything”. You choose whether to merge it into your work or replace it.'})));
   wrap.append(h('div',{class:'ov-grid'},proj,side));
   var nxt=h('div',{class:'card'},h('h2',{text:'Up next'}),h('div',{class:'next',id:'next'}));
   var acts=h('div',{class:'card'},h('h2',{text:'Plot by act'}),h('div',{class:'acts',id:'acts'}));
@@ -602,7 +773,7 @@ function renderStats(){
   var scale=Math.max(goal,total,1),strip=h('div',{class:'strip',role:'img','aria-label':'Words written per chapter against the goal'});
   chs.forEach(function(c,n){
     var w=words(c.body);if(!w)return;
-    strip.append(h('button',{style:'width:'+(w/scale*100)+'%;background:'+SCOLOR[c.status],title:'Chapter '+(n+1)+' · '+fmt(w)+' words · '+c.status,'aria-label':'Chapter '+(n+1)+', '+fmt(w)+' words, '+c.status,
+    strip.append(h('button',{style:'width:'+(w/scale*100)+'%;background:'+SCOLOR[c.status],title:chapLabel(c)+' · '+fmt(w)+' words · '+c.status,'aria-label':chapLabel(c)+', '+fmt(w)+' words, '+c.status,
       onclick:function(){S.section='chapter';S.q='';S.sel=c.id;S.pane='editor';render()}}));
   });
   card.append(strip);
@@ -642,8 +813,21 @@ function renderNextActs(){
   }
 }
 
+var deferred=null;
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();deferred=e;$('#install').hidden=false});
+window.addEventListener('appinstalled',function(){deferred=null;$('#install').hidden=true;toast('Story Desk installed')});
+$('#install').addEventListener('click',function(){
+  if(!deferred)return;
+  deferred.prompt();
+  deferred.userChoice.then(function(){deferred=null;$('#install').hidden=true},function(){});
+});
+$('#import-btn').addEventListener('click',openImport);
+$('#import-file').addEventListener('change',function(e){var f=e.target.files[0];e.target.value='';if(f)readImport(f)});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!$('#overlay').hidden)closeOverlay()});
+
 init();
 })();
 </script>
+
 </body>
 </html>
